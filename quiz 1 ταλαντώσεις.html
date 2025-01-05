@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz-Ταλαντώσεις #1</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .options button {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .options button.correct {
+            background-color: #28a745;
+        }
+        .options button.wrong {
+            background-color: #dc3545;
+        }
+        .navigation {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .navigation button {
+            margin: 0 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .navigation button#prevBtn {
+            background-color: #FFC107;
+            color: #333;
+        }
+        .navigation button#nextBtn {
+            background-color: #28A745;
+            color: #fff;
+        }
+        .navigation button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+            color: blue;
+        }
+        .mistakes {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quiz-Ταλαντώσεις #1</h1>
+        <div id="quiz">
+            <div id="question" class="question"></div>
+            <div class="options">
+                <button onclick="checkAnswer(0)" id="option0">Option 1</button>
+                <button onclick="checkAnswer(1)" id="option1">Option 2</button>
+                <button onclick="checkAnswer(2)" id="option2">Option 3</button>
+                <button onclick="checkAnswer(3)" id="option3">Option 4</button>
+            </div>
+        </div>
+        <div class="navigation" id="navigation">
+            <button id="prevBtn" onclick="prevQuestion()">Προηγούμενη</button>
+            <button id="nextBtn" onclick="nextQuestion()">Επόμενη</button>
+        </div>
+        <div id="result" class="result" style="display: none;"></div>
+        <div id="mistakes" class="mistakes" style="display: none;"></div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "1. Το χρονικό διάστημα που μεσολαβεί μεταξύ δύο διαδοχικών μηδενισμών της ταχύτητας ενός ταλαντωτή που κάνει ΑΑΤ με περίοδο Τ, είναι:",
+                options: ["Τ/2", "Τ/4", "Τ", "2Τ"],
+                answer: 0
+            },
+            {
+                question: "2. Σε μια ΑΑΤ με εξίσωση της επιτάχυνσης είναι: α=α0ημωt, η εξίσωση της απομάκρυνσης είναι:",
+                options: ["x=Αημωt", "x=-Αημωt", "x=Α·συνωt", "x=-Ασυνωt"],
+                answer: 1
+            },
+            {
+                question: "3. Σε μια αρμονική ταλάντωση με περίοδο Τ=0,5s το υλικό σημείο περνάει από τη θέση ισορροπίας μέσα σε χρόνο 10s:",
+                options: ["10 φορές", "20 φορές", "40 φορές", "5 φορές"],
+                answer: 2
+            },
+            {
+                question: "4. Αν διπλασιαστεί το πλάτος μιας ΑΑΤ χωρίς να μεταβληθούν τα φυσικά χαρακτηριστικά του ταλαντωτή τότε:",
+                options: ["Διπλασιάζεται η περίοδος.", "Τετραπλασιάζεται η μέγιστη τιμή της κινητικής ενέργειας.", "Η μέγιστη ταχύτητα διατηρείται σταθερή.", "Η μέγιστη τιμή της κινητικής ενέργειας μένει σταθερή."],
+                answer: 1
+            },
+            {
+                question: "5. Η δυναμική ενέργεια ενός απλού αρμονικού ταλαντωτή είναι μηδέν:",
+                options: ["Στη θέση όπου η επιτάχυνση γίνεται μέγιστη.", "Όταν και η κινητική είναι μηδέν.", "Στη θέση όπου η ταχύτητα γίνεται μέγιστη.", "Στις ακραίες θέσεις του ταλαντωτή."],
+                answer: 2
+            },
+            {
+                question: "6. Μια φθίνουσα ταλάντωση έχει αρχικό πλάτος Α και ενέργεια Ε. Τη χρονική στιγμή που η ολική ενέργεια γίνεται Ε/16 το πλάτος γίνεται:",
+                options: ["Α/9", "Α/4", "Α/3", "Α/2"],
+                answer: 1
+            },
+            {
+                question: "7. Σε μια εξαναγκασμένη ταλάντωση, το σύστημα βρίσκεται σε κατάσταση συντονισμού. Αυτό σημαίνει ότι:",
+                options: ["Η ενέργεια του συστήματος συνεχώς αυξάνεται.", "Το πλάτος είναι μέγιστο.", "Το πλάτος αυξάνεται εκθετικά.", "Η συχνότητα του διεγέρτη είναι μηδενική."],
+                answer: 1
+            },
+            {
+                question: "8. Στη διάρκεια μιας περιόδου μιας ΑΑΤ η δυναμική ενέργεια του ταλαντωτή γίνεται ίση με την κινητική:",
+                options: ["Μια φορά", "Δύο φορές", "Τέσσερις φορές", "Ποτέ"],
+                answer: 2
+            },
+            {
+                question: "9. Η μέγιστη ταχύτητα ενός σώματος που εκτελεί ΑΑΤ επιτυγχάνεται:",
+                options: ["Στη θέση ισορροπίας", "Στις ακραίες θέσεις", "Στα μισά του πλάτους", "Ποτέ"],
+                answer: 0
+            },
+            {
+                question: "10. Στη φθίνουσα ταλάντωση, της οποίας η δυνάμη αντίστασης είναι της μορφής Fαντ=-bu, το πλάτος μειώνεται με το χρόνο:",
+                options: ["Γραμμικά", "Εκθετικά", "Δεν μειώνεται", "Με άγνωστο ρυθμό"],
+                answer: 1
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        const userAnswers = Array(questions.length).fill(null); // Initialize user answers with null
+
+        function loadQuestion() {
+            const questionElement = document.getElementById('question');
+            const options = document.querySelectorAll('.options button');
+
+            const currentQuestion = questions[currentQuestionIndex];
+            questionElement.textContent = currentQuestion.question;
+
+            options.forEach((button, index) => {
+                button.style.display = index < currentQuestion.options.length ? "block" : "none";
+                button.textContent = currentQuestion.options[index] || "";
+                button.className = ""; // Reset button style
+                button.disabled = false;
+
+                if (userAnswers[currentQuestionIndex] !== null) {
+                    if (index === currentQuestion.answer) {
+                        button.classList.add("correct");
+                    } else if (index === userAnswers[currentQuestionIndex]) {
+                        button.classList.add("wrong");
+                    }
+                    button.disabled = true;
+                }
+            });
+
+            updateNavigationButtons();
+        }
+
+        function checkAnswer(selectedOption) {
+            userAnswers[currentQuestionIndex] = selectedOption; // Save user's answer
+            loadQuestion(); // Reload question to reflect changes immediately
+
+            if (selectedOption === questions[currentQuestionIndex].answer) {
+                score++;
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        }
+
+        function updateNavigationButtons() {
+            document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+            document.getElementById('nextBtn').disabled = currentQuestionIndex >= questions.length;
+        }
+
+        function finishQuiz() {
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('navigation').style.display = 'none'; // Hide navigation buttons
+            const percentage = Math.round((score / questions.length) * 100);
+            const resultMessage = percentage > 80 ? "Μπράβο διαβαστερέ!" : (percentage >= 60 ? "Χμμμ καλό αλλά διάβαζε και εξασκήσου." : "Διάβασμα-Εξάσκηση!!!");
+            document.getElementById('result').textContent = `Το ποσοστό επιτυχίας σας είναι: ${percentage}%. ${resultMessage}`;
+            document.getElementById('result').style.display = 'block';
+            showMistakes();
+        }
+
+     function showMistakes() {
+            const mistakesContainer = document.getElementById('mistakes');
+            let mistakesHtml = '<h3 style="text-align:center;">Λάθη:</h3><ul style="list-style:none; text-align:center;">';
+            questions.forEach((question, index) => {
+                if (userAnswers[index] !== question.answer) {
+                    mistakesHtml += `<li style="margin-bottom:20px;">
+                        <div class="question" style="font-weight:bold; color:blue;">${question.question}</div>
+                        <div class="user-answer" style="color:red;">Η απάντησή σας: ${userAnswers[index] !== null ? question.options[userAnswers[index]] : 'Καμία'}</div>
+                        <div class="correct-answer" style="color:green;">Η σωστή απάντηση: ${question.options[question.answer]}</div>
+                    </li>`;
+                }
+            });
+            mistakesHtml += '</ul>';
+            mistakesContainer.innerHTML = mistakesHtml;
+            mistakesContainer.style.display = 'block';
+        }
+
+        document.addEventListener('DOMContentLoaded', loadQuestion);
+    </script>
+</body>
+</html>
